@@ -117,6 +117,11 @@ handler.ping = function(data, callback) {
   callback(200);
 };
 
+// Welcome handler
+handler.welcome = function(data, callback) {
+  callback(200, { message: 'Hello there, welcome to my learning API server' })
+};
+
 // Not found handler
 handler.notFound = function(data, callback){
   callback(404);
@@ -124,5 +129,6 @@ handler.notFound = function(data, callback){
 
 // Define a request router
 const router = {
-  ping: handler.ping
+  ping: handler.ping,
+  hello: handler.welcome
 }
