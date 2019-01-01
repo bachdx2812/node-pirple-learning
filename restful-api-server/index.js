@@ -10,6 +10,8 @@ const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
 const config = require('./config');
 const fs = require('fs');
+const handler = require('./router').handler;
+const router = require('./router').router;
 
 // Instantiating the HTTP server
 const httpServer = http.createServer(function(req, res) {
@@ -103,32 +105,8 @@ const unifiedServer = function(req, res) {
       console.log("headers:", headers);
       // Log the headers
       console.log("Payload:", buffer);
-
+      // Log the response code & payload
       console.log("returning the response: ", statusCode, payloadString);
     });
   });
 };
-
-// Define the handlers
-const handler = {};
-
-// Ping handler
-handler.ping = function(data, callback) {
-  callback(200);
-};
-
-// Welcome handler
-handler.welcome = function(data, callback) {
-  callback(200, { message: 'Hello there, welcome to my learning API server' })
-};
-
-// Not found handler
-handler.notFound = function(data, callback){
-  callback(404);
-};
-
-// Define a request router
-const router = {
-  ping: handler.ping,
-  hello: handler.welcome
-}
