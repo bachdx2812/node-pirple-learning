@@ -5,15 +5,40 @@
 
 // Dependencies
 const http = require('http');
+const https = require('https');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
 const config = require('./config');
+const fs = require('fs');
 
-console.log(config);
+// Instantiating the HTTP server
+const httpServer = http.createServer(function(req, res) {
+  unifiedServer(req, res);
+});
 
-// The server should response to all requests with a string
-const server = http.createServer(function(req, res) {
+// Start the server, and have it listen on port config.port
+httpServer.listen(config.httpPort, function() {
+  console.log("the server is listening on port : ", config.httpPort);
+});
 
+// Read https file content
+const httpsServerOptions = {
+  key: fs.readFileSync('./https/key.pem'),
+  cert: fs.readFileSync('./https/cert.pem')
+};
+
+// Instantiating the HTTP server
+const httpsServer = https.createServer(httpsServerOptions, function(req, res) {
+  unifiedServer(req, res);
+});
+
+// Start the server, and have it listen on port config.port
+httpsServer.listen(config.httpsPort, function() {
+  console.log("the server is listening on port : ", config.httpsPort);
+});
+
+// All the server logic for both the http and https server
+const unifiedServer = function(req, res) {
   // Get the URL and parse it
   const parseUrl = url.parse(req.url, true);
 
@@ -82,20 +107,14 @@ const server = http.createServer(function(req, res) {
       console.log("returning the response: ", statusCode, payloadString);
     });
   });
-});
-
-// Start the server, and have it listen on port config.port
-server.listen(config.port, function() {
-  console.log("the server is listening on port : ", config.port);
-});
+};
 
 // Define the handlers
 const handler = {};
 
-// Sample handler
-handler.sample = function(data, callback) {
-  // Callback a http status cod, and a payload object
-  callback(406, { name: 'sample handler' });
+// Ping handler
+handler.ping = function(data, callback) {
+  callback(200);
 };
 
 // Not found handler
@@ -105,5 +124,5 @@ handler.notFound = function(data, callback){
 
 // Define a request router
 const router = {
-  sample: handler.sample
+  ping: handler.ping
 }
